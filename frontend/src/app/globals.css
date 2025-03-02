@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --background-light: #F8FAFC;
+  --background-dark: #1E293B;
+  --text-light: #1E293B;
+  --text-dark: #F8FAFC;
+  --primary: #6366F1;
+  --secondary: #FACC15;
+}
+
+body {
+  background-color: var(--background-light);
+  color: var(--text-light);
+  transition: all 0.3s ease-in-out;
+}
+
+.dark body {
+  background-color: var(--background-dark);
+  color: var(--text-dark);
+}
