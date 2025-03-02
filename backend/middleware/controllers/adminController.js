@@ -59,12 +59,15 @@ export const addProject = async (req, res) => {
   try {
     const { name, colorTheme, url } = req.body;
     const logo = req.file ? req.file.path : ""; // If image uploaded
-
+    const slug = name.toLowerCase().replace(/\s+/g, "-");
+    const status = true;
     const project = new Project({
       name,
       colorTheme,
       url,
       logo,
+      slug,
+      status,
       createdBy: req.admin.id, // Store admin ID
     });
 

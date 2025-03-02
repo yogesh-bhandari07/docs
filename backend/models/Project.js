@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 const projectSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
+    status: { type: String, required: true },
+    slug: { type: String, required: true, unique: true },
     colorTheme: { type: String, required: true },
     url: { type: String, required: true },
     logo: { type: String, default: "" },
@@ -14,6 +16,17 @@ const projectSchema = new mongoose.Schema(
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+projectSchema.index({ name: "text", description: "text" });
+
+//auto ganerate unique slug using name
+projectSchema.pre("save", async function (next) {
+  this.status = true;
+
+  this.slug = this.name.toLowerCase().replace(/\s+/g, "-");
+
+  next();
+});
 
 // ✅ Virtual field to generate full logo URL
 projectSchema.virtual("logoUrl").get(function () {

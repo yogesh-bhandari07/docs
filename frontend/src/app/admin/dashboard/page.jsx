@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import AddProjectModal from "@/components/AddProjectModal";
 import { apiRequest } from "@/services/api";
 import SkeletonLoader from "@/components/ui/SkeletonLoader";
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
   const [projects, setProjects] = useState([]); // ✅ Initialize as empty array
@@ -31,7 +32,7 @@ export default function Dashboard() {
     setProjects([...projects, newProject]);
     setShowModal(false);
   };
-
+  const router = useRouter();
   if (loading) return <SkeletonLoader />;
   if (error) return <p className="text-red-500 text-center">{error}</p>;
 
@@ -46,6 +47,7 @@ export default function Dashboard() {
               key={project._id}
               className="bg-white shadow-lg rounded-lg p-4 border"
               style={{ borderColor: project.colorTheme }}
+              onClick={() => router.push(`/admin/project/${project.slug}`)}
             >
               <div className="flex items-center space-x-4">
                 <img
