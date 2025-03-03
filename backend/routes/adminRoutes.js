@@ -6,7 +6,15 @@ import {
   addProject,
   getProjects,
   deleteProject,
+  getProject,
 } from "../middleware/controllers/adminController.js";
+import {
+  getParentPages,
+  addPage,
+  getPages,
+  getApiDetails,
+  addUpdateApiDetails,
+} from "../middleware/controllers/pagesController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import multer from "multer";
 const router = express.Router();
@@ -31,5 +39,10 @@ router.post("/login", loginAdmin);
 router.post("/logout", authMiddleware, logoutAdmin);
 router.post("/add-project", authMiddleware, upload.single("logo"), addProject);
 router.get("/projects", authMiddleware, getProjects);
+router.get("/get-project/:slug", authMiddleware, getProject);
 router.delete("/projects/:id", authMiddleware, deleteProject);
+router.get("/get-parent-pages/:projectID", authMiddleware, getParentPages);
+router.get("/get-pages/:projectID", authMiddleware, getPages);
+
+router.post("/add-page", authMiddleware, addPage);
 export default router;

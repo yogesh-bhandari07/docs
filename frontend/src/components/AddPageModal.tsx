@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { apiRequest } from "@/services/api";
 
@@ -12,24 +12,30 @@ const pageSchema = z.object({
 export default function AddPageModal({
   onClose,
   onSave,
+  project_id,
 }: {
   onClose: () => void;
   onSave: (data: any) => void;
+  project_id: number;
 }) {
-  const [form, setForm] = useState({
+  console.log("Project ID:", project_id);
+  const [form, setForm]: any = useState({
     name: "",
     title: "",
-    parent_id: "",
+    parentID: "",
+    projectID: project_id,
   });
+
+  const [parentPages, setParentPages] = useState<any[]>([]);
   const [errors, setErrors] = useState<any>({});
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setForm((prev) => ({
+    setForm((prev: any) => ({
       ...prev,
-      [name]: name === "parent_id" && value ? Number(value) : value,
+      [name]: value, // Directly set the value
     }));
   };
 
@@ -40,13 +46,8 @@ export default function AddPageModal({
       return;
     }
 
-    const formData = new FormData();
-    formData.append("name", form.name);
-    formData.append("title", form.title);
-    if (form.parent_id) formData.append("parent_id", String(form.parent_id));
-
     try {
-      const response = await apiRequest("add-page", "POST", formData, false);
+      const response = await apiRequest("add-page", "POST", form, false);
       if (response) {
         onSave(form);
         onClose();
@@ -56,16 +57,38 @@ export default function AddPageModal({
     }
   };
 
+  useEffect(() => {
+    // Fetch parent pages from API
+    const fetchParentPages = async () => {
+      try {
+        const response = await apiRequest(
+          `get-parent-pages/${project_id}`,
+          "GET",
+          null,
+          false
+        );
+        if (response) {
+          setParentPages(response);
+        }
+      } catch (error) {
+        console.error("Error fetching parent pages:", error);
+      }
+    };
+    fetchParentPages();
+  }, []);
+
   return (
-    <div className="fixed inset-0 flex justify-center items-center bg-black/30 backdrop-blur-sm">
-      <div className="bg-white/90 p-6 rounded-lg shadow-lg w-96">
-        <h2 className="text-xl font-bold mb-4">Add Page</h2>
+    <div className="fixed inset-0 flex justify-center items-center bg-black/30 dark:bg-black/50 backdrop-blur-sm">
+      <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg w-96">
+        <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+          Add Page
+        </h2>
 
         <input
           type="text"
           name="name"
           placeholder="Page Name"
-          className="w-full p-2 border rounded mb-2"
+          className="w-full p-2 border rounded mb-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700"
           value={form.name}
           onChange={handleChange}
         />
@@ -77,7 +100,7 @@ export default function AddPageModal({
           type="text"
           name="title"
           placeholder="Page Title"
-          className="w-full p-2 border rounded mb-2"
+          className="w-full p-2 border rounded mb-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700"
           value={form.title}
           onChange={handleChange}
         />
@@ -87,28 +110,35 @@ export default function AddPageModal({
 
         {/* Parent Page Select Dropdown */}
         <select
-          name="parent_id"
-          className="w-full p-2 border rounded mb-2"
-          value={form.parent_id || ""}
+          name="parentID"
+          className="w-full p-2 border rounded mb-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700"
+          value={form.parentID || ""}
           onChange={handleChange}
         >
-          <option value="">Select Parent Page</option>
-          <option value="1">Parent Page 1</option>
-          <option value="2">Parent Page 2</option>
-          <option value="3">Parent Page 3</option>
+          <option value="" selected disabled>
+            Select Parent Page
+          </option>
+          {parentPages.map((page) => (
+            <option key={page.id} value={page.id}>
+              {page.title}
+            </option>
+          ))}
         </select>
+        {errors.parentID && (
+          <p className="text-red-500 text-sm">{errors.parentID._errors[0]}</p>
+        )}
 
         {/* Buttons */}
         <div className="flex justify-end mt-4">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-500 text-white rounded mr-2"
+            className="px-4 py-2 bg-gray-500 dark:bg-gray-700 text-white rounded mr-2"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 bg-blue-500 text-white rounded"
+            className="px-4 py-2 bg-blue-500 dark:bg-blue-600 text-white rounded"
           >
             Save
           </button>

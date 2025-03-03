@@ -17,6 +17,11 @@ const Pages = new mongoose.Schema(
       ref: "Project",
       required: true,
     },
+    parentID: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Page",
+      required: false,
+    },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );

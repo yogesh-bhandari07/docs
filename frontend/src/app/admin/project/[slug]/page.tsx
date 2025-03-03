@@ -2,12 +2,36 @@
 import { useParams } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import Editor from "@/components/Editor";
-
+import { use, useEffect, useState } from "react";
+import { apiRequest } from "@/services/api";
 export default function ProjectPage() {
   const { slug } = useParams();
+  const [project, setProject]: any = useState([]);
+
+  useEffect(() => {
+    console.log("Slug:", slug);
+
+    const fetchProject = async () => {
+      try {
+        const response = await apiRequest(
+          `get-project/${slug}`,
+          "GET",
+          null,
+          false
+        );
+        if (response) {
+          setProject(response);
+        }
+      } catch (error) {
+        console.error("Error fetching parent pages:", error);
+      }
+    };
+
+    fetchProject();
+  }, [slug]);
   return (
     <div className="flex h-screen">
-      <Sidebar />
+      <Sidebar project_id={project?.id} />
 
       <div className="flex-1 flex flex-col">
         <nav className="p-4 bg-gray-900 text-white shadow-md flex items-center">

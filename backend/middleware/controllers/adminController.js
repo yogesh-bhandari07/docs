@@ -84,6 +84,16 @@ export const getProjects = async (req, res) => {
   }
 };
 
+export const getProject = async (req, res) => {
+  try {
+    const project = await Project.findOne({ slug: req.params.slug });
+    if (!project) return res.status(404).json({ message: "Project not found" });
+    res.json(project);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export const deleteProject = async (req, res) => {
   try {
     const project = await Project.findById(req.params.id);

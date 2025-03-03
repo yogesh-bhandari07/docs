@@ -27,7 +27,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/admin/login/page.jsx"
+    "src/app/admin/login/page.jsx",
+    "src/components/AddPageModal.tsx",
+    "src/services/api.js"
   ],
   "exclude": ["node_modules"]
 }

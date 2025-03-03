@@ -5,6 +5,7 @@ export async function apiRequest(
   isFormData = false
 ) {
   const token = localStorage.getItem("token");
+  console.log(token);
 
   const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
@@ -13,12 +14,25 @@ export async function apiRequest(
     headers["Content-Type"] = "application/json";
   }
 
+  // Ensure `body` is `null` instead of `undefined`
+  const requestBody =
+    body && !isFormData
+      ? JSON.stringify(
+          Object.fromEntries(
+            Object.entries(body).map(([key, value]) => [
+              key,
+              value === "" ? null : value, // Convert empty strings to null
+            ])
+          )
+        )
+      : body;
+
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/${endpoint}`,
     {
       method,
       headers,
-      body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
+      body: requestBody,
     }
   );
 
