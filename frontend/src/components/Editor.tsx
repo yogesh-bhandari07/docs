@@ -1,48 +1,25 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import EditorJS from "@editorjs/editorjs";
-import Header from "@editorjs/header";
-import List from "@editorjs/list";
-import ImageTool from "@editorjs/image";
-import Paragraph from "@editorjs/paragraph";
+import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
-const Editor = () => {
-  const editorRef = useRef<EditorJS | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      if (!editorRef.current) {
-        editorRef.current = new EditorJS({
-          holder: "editorjs",
-          tools: {
-            header: Header,
-            list: List,
-            image: ImageTool,
-            paragraph: Paragraph,
-          },
-          placeholder: "Start typing here...",
-        });
-      }
-    }
-
-    return () => {
-      // ✅ Fix: Ensure destroy is called only if editor instance exists
-      if (
-        editorRef.current &&
-        typeof editorRef.current.destroy === "function"
-      ) {
-        editorRef.current.destroy();
-        editorRef.current = null;
-      }
-    };
-  }, []);
+export default function Editor() {
+  const [markdown, setMarkdown] = useState("## Hello, Markdown!");
 
   return (
-    <div className="p-4 border rounded-md shadow-md">
-      <div id="editorjs"></div>
+    <div className="p-4 max-w-2xl mx-auto">
+      <textarea
+        className="w-full h-40 p-2 border rounded-md focus:ring focus:ring-blue-300"
+        value={markdown}
+        onChange={(e) => setMarkdown(e.target.value)}
+        placeholder="Write Markdown here..."
+      />
+
+      <div className="border p-4 mt-4 bg-gray-100 rounded-md">
+        <h2 className="text-lg font-semibold mb-2">Preview:</h2>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
+      </div>
     </div>
   );
-};
-
-export default Editor;
+}
