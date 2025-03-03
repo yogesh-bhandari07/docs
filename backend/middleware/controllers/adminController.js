@@ -3,7 +3,6 @@ import Project from "../../models/Project.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-// Admin Login
 export const loginAdmin = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -27,7 +26,6 @@ export const loginAdmin = async (req, res) => {
   }
 };
 
-// Admin Logout
 export const logoutAdmin = async (req, res) => {
   try {
     await Admin.findByIdAndUpdate(req.admin.id, { lastLogout: new Date() });
@@ -37,7 +35,6 @@ export const logoutAdmin = async (req, res) => {
   }
 };
 
-// admin register
 export const registerAdmin = async (req, res) => {
   try {
     const { name, email, password } = req.body;
