@@ -8,7 +8,7 @@ export default function Editor() {
   const [markdown, setMarkdown] = useState("## Hello, Markdown!");
 
   return (
-    <div className="p-4 max-w-2xl mx-auto">
+    <div className="p-4 mx-auto">
       <textarea
         className="w-full h-40 p-2 border rounded-md focus:ring focus:ring-blue-300"
         value={markdown}
