@@ -29,7 +29,8 @@
     ".next/types/**/*.ts",
     "src/app/admin/login/page.jsx",
     "src/components/AddPageModal.tsx",
-    "src/services/api.js"
+    "src/services/api.js",
+    "src/components/ApiTester.jsx"
   ],
   "exclude": ["node_modules"]
 }
