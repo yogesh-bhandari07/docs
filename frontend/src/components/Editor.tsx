@@ -1,11 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-export default function Editor() {
-  const [markdown, setMarkdown] = useState("## Hello, Markdown!");
+export default function Editor({ page }: { page: any }) {
+  console.log("Page:", page);
+  const [markdown, setMarkdown] = useState(
+    page?.page?.content || "## Hello, Markdown!"
+  );
+
+  useEffect(() => {
+    setMarkdown(page?.page?.content || "## Hello, Markdown!");
+  }, [page]);
 
   return (
     <div className="p-4 mx-auto">

@@ -14,6 +14,7 @@ import {
   getPages,
   getApiDetails,
   addUpdateApiDetails,
+  getPageData,
 } from "../middleware/controllers/pagesController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import multer from "multer";
@@ -43,6 +44,8 @@ router.get("/get-project/:slug", authMiddleware, getProject);
 router.delete("/projects/:id", authMiddleware, deleteProject);
 router.get("/get-parent-pages/:projectID", authMiddleware, getParentPages);
 router.get("/get-pages/:projectID", authMiddleware, getPages);
+router.get("/get-page/:pageID", authMiddleware, getPageData);
+router.post("/page-api", authMiddleware, addUpdateApiDetails);
 
 router.post("/add-page", authMiddleware, addPage);
 export default router;
