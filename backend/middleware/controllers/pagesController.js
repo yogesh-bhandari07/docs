@@ -1,4 +1,5 @@
 import Page from "../../models/Pages.js";
+import PageAPI from "../../models/PageAPI.js";
 
 export const getPages = async (req, res) => {
   try {
@@ -40,6 +41,7 @@ export const addPage = async (req, res) => {
   try {
     const { name, title, parentID, projectID } = req.body;
     const slug = name.toLowerCase().replace(/\s+/g, "-");
+    const content = "";
     console.log(name, title, slug, parentID, projectID);
     const page = new Page({
       name,
@@ -48,6 +50,7 @@ export const addPage = async (req, res) => {
       parentID,
       projectID,
       createdBy: req.admin.id,
+      content,
       status: true,
     });
 
@@ -60,7 +63,7 @@ export const addPage = async (req, res) => {
 
 export const addUpdateApiDetails = async (req, res) => {
   try {
-    const apiDetails = await PageAPI.findOne({ pageID: req.params.pageID });
+    const apiDetails = await PageAPI.findOne({ pageID: req.body.pageID });
     if (apiDetails) {
       apiDetails.url = req.body.url;
       apiDetails.method = req.body.method;
@@ -74,8 +77,8 @@ export const addUpdateApiDetails = async (req, res) => {
         .json({ message: "API details updated successfully!", apiDetails });
     } else {
       const { url, method, headers, params, body, sample } = req.body;
-      const pageID = req.params.pageID;
-      const projectID = req.params.projectID;
+      const pageID = req.body.pageID;
+      const projectID = req.body.projectID;
       const api = new PageAPI({
         url,
         method,
@@ -103,6 +106,22 @@ export const getParentPages = async (req, res) => {
     });
     res.json(pages);
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getPageData = async (req, res) => {
+  try {
+    const page = await Page.findById(req.params.pageID).lean();
+    if (!page) {
+      return res.status(404).json({ message: "Page not found" });
+    }
+
+    const pageAPIs = await PageAPI.find({ pageID: page._id }).lean();
+
+    res.json({ page, apis: pageAPIs });
+  } catch (error) {
+    console.error("Error fetching page data:", error);
     res.status(500).json({ error: error.message });
   }
 };

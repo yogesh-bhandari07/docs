@@ -9,10 +9,18 @@ import {
   ChevronRight as ArrowRight,
 } from "lucide-react";
 
-export default function Sidebar({ project_id }: { project_id: any }) {
+export default function Sidebar({
+  project_id,
+  onPageSelect,
+}: {
+  project_id: any;
+  onPageSelect: (page: any) => void;
+}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pages, setPages] = useState<any[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [selectedPage, setSelectedPage] = useState<any>(null);
+
   useEffect(() => {
     const fetchPages = async () => {
       try {
@@ -23,8 +31,14 @@ export default function Sidebar({ project_id }: { project_id: any }) {
           null,
           false
         );
-        const formattedPages = buildPageHierarchy(response || []);
-        setPages(formattedPages);
+        console.log("API Response:", response);
+
+        setPages(response || []);
+
+        if (response.length > 0) {
+          setSelectedPage(response[0]);
+          onPageSelect(response[0]);
+        }
       } catch (error) {
         console.error("Error fetching pages:", error);
       }
@@ -32,36 +46,13 @@ export default function Sidebar({ project_id }: { project_id: any }) {
     fetchPages();
   }, [project_id]);
 
-  // Convert flat list of pages into a nested structure
-  const buildPageHierarchy = (pages: any[]) => {
-    let pageMap: any = {};
-    let rootPages: any[] = [];
-
-    // Initialize page map with children array
-    pages.forEach((page) => {
-      pageMap[page._id] = {
-        ...page,
-        children: pageMap[page._id]?.children || [],
-      };
-    });
-
-    pages.forEach((page) => {
-      if (page.parentID && pageMap[page.parentID]) {
-        if (!pageMap[page.parentID].children) {
-          pageMap[page.parentID].children = [];
-        }
-        pageMap[page.parentID].children.push(pageMap[page._id]);
-      } else {
-        rootPages.push(pageMap[page._id]);
-      }
-    });
-
-    return rootPages;
+  const handlePageSelect = (page: any) => {
+    setSelectedPage(page);
+    onPageSelect(page);
   };
 
   return (
     <div className="flex">
-      {/* Sidebar */}
       <aside
         className={`bg-gray-800 text-white h-screen p-4 transition-all duration-300 ${
           isSidebarOpen ? "w-64" : "w-0 overflow-hidden"
@@ -83,11 +74,16 @@ export default function Sidebar({ project_id }: { project_id: any }) {
                 onSave={(data) => {
                   console.log("Page added:", data);
                   setIsModalOpen(false);
+                  setPages([...pages, data]); // ✅ Add new page in sidebar
                 }}
               />
             )}
 
-            <PageList pages={pages} />
+            <PageList
+              pages={pages}
+              selectedPage={selectedPage}
+              onPageSelect={handlePageSelect}
+            />
           </>
         )}
       </aside>
@@ -102,35 +98,67 @@ export default function Sidebar({ project_id }: { project_id: any }) {
   );
 }
 
-function PageList({ pages }: { pages: any[] }) {
+function PageList({
+  pages,
+  selectedPage,
+  onPageSelect,
+}: {
+  pages: any[];
+  selectedPage: any;
+  onPageSelect: (page: any) => void;
+}) {
   return (
     <ul>
       {pages.map((page) => (
-        <PageItem key={page._id} page={page} />
+        <PageItem
+          key={page._id}
+          page={page}
+          selectedPage={selectedPage}
+          onSelectPage={onPageSelect}
+        />
       ))}
     </ul>
   );
 }
 
-function PageItem({ page }: { page: any }) {
+function PageItem({
+  page,
+  selectedPage,
+  onSelectPage,
+}: {
+  page: any;
+  selectedPage: any;
+  onSelectPage: (page: any) => void;
+}) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <li className="mb-2">
       <button
-        className="w-full text-left p-2 bg-gray-700 hover:bg-gray-600 rounded flex items-center justify-between"
-        onClick={() => setIsOpen(!isOpen)}
+        className={`w-full text-left p-2 rounded flex items-center justify-between ${
+          selectedPage && selectedPage._id === page._id
+            ? "bg-blue-600"
+            : "bg-gray-700 hover:bg-gray-600"
+        }`}
+        onClick={() => {
+          setIsOpen(!isOpen);
+          onSelectPage(page); // ✅ Send the full page object
+        }}
       >
         <span>{page.name}</span>
-        {page.children &&
-          page.children.length > 0 &&
+        {page.children?.length > 0 &&
           (isOpen ? <ChevronDown size={16} /> : <ArrowRight size={16} />)}
       </button>
 
-      {isOpen && page.children && page.children.length > 0 && (
+      {isOpen && page.children?.length > 0 && (
         <ul className="pl-4 border-l-2 border-gray-500 mt-1">
           {page.children.map((child: any) => (
-            <PageItem key={child._id} page={child} />
+            <PageItem
+              key={child._id}
+              page={child}
+              selectedPage={selectedPage}
+              onSelectPage={onSelectPage}
+            />
           ))}
         </ul>
       )}

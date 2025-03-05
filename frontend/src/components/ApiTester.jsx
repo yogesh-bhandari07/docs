@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
+import { apiRequest } from "@/services/api";
 
-export default function ApiTester() {
+export default function ApiTester({ page, api }) {
   const [method, setMethod] = useState("GET");
   const [url, setUrl] = useState("");
   const [authType, setAuthType] = useState("none");
@@ -12,6 +13,46 @@ export default function ApiTester() {
   const [headers, setHeaders] = useState([{ key: "", value: "" }]);
   const [bodyParams, setBodyParams] = useState([{ key: "", value: "" }]);
   const [response, setResponse] = useState(null);
+
+  // API data ko prefill karne ke liye useEffect
+  useEffect(() => {
+    console.log("API data:", api);
+    if (api) {
+      setMethod(api.method || "GET");
+      setUrl(api.url || "");
+
+      setQueryParams(
+        api.params?.length > 0 ? api.params : [{ key: "", value: "" }]
+      );
+
+      setHeaders(
+        api.headers?.length > 0 ? api.headers : [{ key: "", value: "" }]
+      );
+
+      setBodyParams(api.body?.length > 0 ? api.body : [{ key: "", value: "" }]);
+
+      if (api.headers) {
+        const authHeader = api.headers.find((h) => h.key === "Authorization");
+        if (authHeader) {
+          if (authHeader.value.startsWith("Basic")) {
+            const decoded = atob(authHeader.value.replace("Basic ", ""));
+            const [username, password] = decoded.split(":");
+            setAuthType("basic");
+            setBasicAuth({ username, password });
+          } else if (authHeader.value.startsWith("Bearer")) {
+            setAuthType("oauth");
+            setOauthToken(authHeader.value.replace("Bearer ", ""));
+          }
+        }
+      }
+    } else {
+      setQueryParams([{ key: "", value: "" }]);
+      setHeaders([{ key: "", value: "" }]);
+      setBodyParams([{ key: "", value: "" }]);
+      setMethod("GET");
+      setUrl("");
+    }
+  }, [api]);
 
   const handleAddField = (setter) =>
     setter((prev) => [...prev, { key: "", value: "" }]);
@@ -61,6 +102,40 @@ export default function ApiTester() {
     }
   };
 
+  const handleSubmit = async () => {
+    try {
+      console.log("Submitting API details...", {
+        url,
+        method,
+        headers,
+        params: queryParams,
+        body: bodyParams,
+        pageID: page?._id || null,
+        projectID: page?.projectID || null,
+      });
+
+      const response = await apiRequest(
+        "/page-api",
+        "POST",
+        {
+          url,
+          method,
+          headers,
+          params: queryParams,
+          body: bodyParams,
+          sample: null,
+          pageID: page?._id || null,
+          projectID: page?.projectID || null,
+        },
+        false
+      );
+
+      console.log("API details saved successfully!", response);
+    } catch (error) {
+      console.error("Error saving API details:", error);
+    }
+  };
+
   return (
     <div className="p-6 bg-backgroundDark text-textDark min-h-screen flex flex-col items-center">
       <motion.h1
@@ -90,49 +165,12 @@ export default function ApiTester() {
             value={url}
             onChange={(e) => setUrl(e.target.value)}
           />
-        </div>
-        <div className="mb-4">
-          <label className="font-semibold">Authentication</label>
-          <select
-            className="p-2 border w-full rounded-md bg-white text-textLight"
-            value={authType}
-            onChange={(e) => setAuthType(e.target.value)}
+          <button
+            onClick={handleSendRequest}
+            className="bg-amber-500 px-4 py-2 rounded-md "
           >
-            <option value="none">None</option>
-            <option value="basic">Basic Auth</option>
-            <option value="oauth">OAuth</option>
-          </select>
-          {authType === "basic" && (
-            <div className="mt-2 flex gap-2">
-              <input
-                type="text"
-                className="p-2 border rounded-md bg-white text-textLight"
-                placeholder="Username"
-                value={basicAuth.username}
-                onChange={(e) =>
-                  setBasicAuth({ ...basicAuth, username: e.target.value })
-                }
-              />
-              <input
-                type="password"
-                className="p-2 border rounded-md bg-white text-textLight"
-                placeholder="Password"
-                value={basicAuth.password}
-                onChange={(e) =>
-                  setBasicAuth({ ...basicAuth, password: e.target.value })
-                }
-              />
-            </div>
-          )}
-          {authType === "oauth" && (
-            <input
-              type="text"
-              className="p-2 border rounded-md w-full mt-2 bg-white text-textLight"
-              placeholder="OAuth Token"
-              value={oauthToken}
-              onChange={(e) => setOauthToken(e.target.value)}
-            />
-          )}
+            Send
+          </button>
         </div>
         {[
           { label: "Query Params", state: queryParams, setter: setQueryParams },
@@ -171,26 +209,26 @@ export default function ApiTester() {
                 </button>
               </div>
             ))}
-            <button
-              className="bg-primary text-white px-4 py-2 rounded-md"
-              onClick={() => handleAddField(setter)}
-            >
-              + Add
-            </button>
           </div>
         ))}
         <button
-          className="w-full bg-secondary text-backgroundDark font-bold px-6 py-3 rounded-md mt-4 hover:bg-amber-500 transition"
-          onClick={handleSendRequest}
+          className="w-full bg-amber-500 px-6 py-3 rounded-md mt-4"
+          onClick={handleSubmit}
         >
-          Send Request
+          Save
         </button>
+
+        <div className="mt-6 overflow-x-scroll">
+          <h2 className="text-lg font-bold mb-2 text-secondary">Response</h2>
+          <div className="p-4 bg-white rounded-md shadow-md text-textDark">
+            {response ? (
+              <pre>{JSON.stringify(response, null, 2)}</pre>
+            ) : (
+              <p>No response yet.</p>
+            )}
+          </div>
+        </div>
       </div>
-      {response && (
-        <pre className="mt-6 p-6 bg-gray-900 text-white rounded-lg w-full max-w-2xl overflow-auto max-h-64">
-          {JSON.stringify(response, null, 2)}
-        </pre>
-      )}
     </div>
   );
 }
