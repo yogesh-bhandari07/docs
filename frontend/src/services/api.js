@@ -4,17 +4,14 @@ export async function apiRequest(
   body = null,
   isFormData = false
 ) {
-  const token = localStorage.getItem("token");
-  console.log(token);
+  const token = request.cookies.get("token")?.value;
 
   const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-  // JSON body ke liye headers set karo
   if (!isFormData) {
     headers["Content-Type"] = "application/json";
   }
 
-  // Ensure `body` is `null` instead of `undefined`
   const requestBody =
     body && !isFormData
       ? JSON.stringify(
