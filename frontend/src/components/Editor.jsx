@@ -7,18 +7,23 @@ import remarkGfm from "remark-gfm";
 import Toast from "@/components/Toast";
 export default function Editor({ page }) {
   console.log("Page:", page);
-  const pageID = page?.page?.id;
   const [markdown, setMarkdown] = useState(
     page?.page?.content || "## Write Markdown here..."
   );
+
+  const [pageID, setPageID] = useState(null);
   const [toast, setToast] = useState(null);
   useEffect(() => {
     setMarkdown(page?.page?.content || "## Write Markdown here...");
+    setPageID(page?.page?._id);
   }, [page]);
 
   const handleSave = async () => {
     try {
-      console.log("Saving Markdown...", markdown);
+      console.log({
+        _id: pageID,
+        content: markdown ?? "",
+      });
       const response = await apiRequest(
         "/update-page",
         "PUT",

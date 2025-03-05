@@ -25,7 +25,7 @@ export default function Sidebar({
       try {
         console.log("Fetching pages for project:", project_id);
         const response = await apiRequest(
-          `get-pages/${project_id}`,
+          `user/get-pages/${project_id}`,
           "GET",
           null,
           false
@@ -53,7 +53,7 @@ export default function Sidebar({
   return (
     <div className="flex">
       <aside
-        className={`bg-gray-800 text-white h-screen p-4 transition-all duration-300 ${
+        className={`bg-gray-800 text-white h-sccreen p-4 transition-all duration-300 ${
           isSidebarOpen ? "w-64" : "w-0 overflow-hidden"
         }`}
       >
@@ -88,7 +88,7 @@ function PageList({
   onPageSelect: (page: any) => void;
 }) {
   return (
-    <ul>
+    <ul className="mt-12">
       {pages.map((page) => (
         <PageItem
           key={page._id}
@@ -115,7 +115,7 @@ function PageItem({
   return (
     <li className="mb-2">
       <button
-        className={`w-full text-left p-2 rounded flex items-center justify-between ${
+        className={`w-full text-left p-2 rounded flex items-center justify-between   ${
           selectedPage && selectedPage._id === page._id
             ? "bg-blue-600"
             : "bg-gray-700 hover:bg-gray-600"

@@ -1,6 +1,5 @@
 "use client";
 
-import { apiRequest } from "@/services/api";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -11,17 +10,16 @@ export default function Editor({ page }) {
   const [markdown, setMarkdown] = useState(
     page?.page?.content || "## Write Markdown here..."
   );
+  const [title, setTitle] = useState(page?.page?.title || "");
   const [toast, setToast] = useState(null);
   useEffect(() => {
     setMarkdown(page?.page?.content || "## Write Markdown here...");
   }, [page]);
 
   return (
-    <div className="p-4 mx-auto">
-      <div className="border p-4 mt-4 bg-gray-100 rounded-md">
-        <h2 className="text-lg font-semibold mb-2">Preview:</h2>
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
-      </div>
+    <div className="p-4 mx-auto ">
+      <h1 className="text-3xl font-bold mb-4">{title ?? "title"}</h1>
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
 
       {toast && (
         <Toast

@@ -51,4 +51,5 @@ router.post("/page-api", authMiddleware, addUpdateApiDetails);
 router.post("/add-page", authMiddleware, addPage);
 
 router.put("/update-page", authMiddleware, updatePageContent);
+
 export default router;

@@ -1,5 +1,6 @@
 import Page from "../../models/Pages.js";
 import PageAPI from "../../models/PageAPI.js";
+import Project from "../../models/Project.js";
 
 export const getPages = async (req, res) => {
   try {
@@ -137,6 +138,21 @@ export const updatePageContent = async (req, res) => {
       { new: true }
     );
     res.status(200).json({ message: "Page updated successfully!", page });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// for user
+
+export const getProjectData = async (req, res) => {
+  try {
+    const project = await Project.findOne({ slug: req.params.slug }).lean();
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+    const pages = await Page.find({ projectID: project._id }).lean();
+    res.json({ project, pages });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -4,15 +4,18 @@ import Editor from "@/components/user/Editor";
 import { use, useEffect, useState } from "react";
 import { apiRequest } from "@/services/api";
 import ApiTester from "@/components/user/ApiTester";
-// import { headers } from "next/headers";
-export default async function Home() {
-  // const requestHeaders = await headers();
-  // const slugOfProject = requestHeaders.get("slugOfProject") || "No Subdomain";
-  const slugOfProject = "No Subdomain";
+const Cookies = require("js-cookie");
+export default function Home() {
   const [project, setProject]: any = useState([]);
   const [selectedPage, setSelectedPage] = useState<any>(null);
   const [selectedPageDetails, setSelectedPageDetails] = useState<any>(null);
   const [setPageApiData, setSetPageApiData] = useState<any>(null);
+  const [slugOfProject, setSlugOfProject] = useState("");
+
+  useEffect(() => {
+    const subdomain = Cookies.get("subdomain");
+    setSlugOfProject(subdomain);
+  }, []);
 
   useEffect(() => {
     console.log("Slug:", slugOfProject);
@@ -20,13 +23,13 @@ export default async function Home() {
     const fetchProject = async () => {
       try {
         const response = await apiRequest(
-          `get-project/${slugOfProject}`,
+          `user/get-project/${slugOfProject}`,
           "GET",
           null,
           false
         );
         if (response) {
-          setProject(response);
+          setProject(response?.project);
         }
       } catch (error) {
         console.error("Error fetching project:", error);
@@ -45,7 +48,7 @@ export default async function Home() {
       }
       try {
         const response = await apiRequest(
-          `get-page/${selectedPage._id}`,
+          `user/get-page/${selectedPage._id}`,
           "GET",
           null,
           false
@@ -78,17 +81,18 @@ export default async function Home() {
     }
   }, [selectedPage]);
 
+  console.log("Selected Page Details:", project);
   return (
     <div className="flex h-screen">
-      <Sidebar project_id={project?.id} onPageSelect={setSelectedPage} />
+      <Sidebar project_id={project?._id} onPageSelect={setSelectedPage} />
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-hidden">
         <nav className="p-4 bg-gray-900 text-white shadow-md flex items-center">
           <h1 className="text-xl font-bold">{slugOfProject}</h1>
         </nav>
 
-        <div className="flex flex-1 p-4 gap-4">
-          <div className="flex-1 bg-white shadow-md p-4 rounded-lg">
+        <div className="flex flex-1 p-4 gap-4 ">
+          <div className="flex-1 bg-white shadow-md p-4 rounded-lg overflow-y-auto h-[90%]">
             {selectedPage ? (
               <Editor page={selectedPageDetails} />
             ) : (
@@ -96,7 +100,7 @@ export default async function Home() {
             )}
           </div>
 
-          <div className="bg-gray-100 shadow-md rounded-lg">
+          <div className="bg-gray-100 shadow-md rounded-lg overflow-y-auto h-[90%]">
             <ApiTester
               page={selectedPageDetails?.page}
               api={selectedPageDetails?.apis[0] ?? null}

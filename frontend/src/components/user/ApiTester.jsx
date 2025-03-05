@@ -1,7 +1,7 @@
+"use client";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { apiRequest } from "@/services/api";
 import Toast from "@/components/Toast";
 
 export default function ApiTester({ page, api }) {
@@ -166,11 +166,13 @@ export default function ApiTester({ page, api }) {
           </div>
         ))}
 
-        <div className="mt-6 overflow-x-scroll">
+        <div className="mt-6 w-full max-w-2xl">
           <h2 className="text-lg font-bold mb-2 text-secondary">Response</h2>
-          <div className="p-4 bg-white rounded-md shadow-md text-textDark">
+          <div className="p-4 bg-white rounded-md shadow-md text-textDark w-full max-w-full overflow-auto">
             {response ? (
-              <pre>{JSON.stringify(response, null, 2)}</pre>
+              <pre className="whitespace-pre-wrap break-words">
+                {JSON.stringify(response, null, 2)}
+              </pre>
             ) : (
               <p>No response yet.</p>
             )}

@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 dotenv.config();
@@ -15,6 +16,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.use("/api/admin/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 
 const PORT = process.env.PORT || 5000;

@@ -81,13 +81,13 @@ export default function ProjectPage() {
     <div className="flex h-screen">
       <Sidebar project_id={project?.id} onPageSelect={setSelectedPage} />
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-hidden">
         <nav className="p-4 bg-gray-900 text-white shadow-md flex items-center">
           <h1 className="text-xl font-bold">{slug}</h1>
         </nav>
 
         <div className="flex flex-1 p-4 gap-4">
-          <div className="flex-1 bg-white shadow-md p-4 rounded-lg">
+          <div className="flex-1 bg-white shadow-md p-4 rounded-lg overflow-y-auto h-[90%]">
             {selectedPage ? (
               <Editor page={selectedPageDetails} />
             ) : (
@@ -95,7 +95,7 @@ export default function ProjectPage() {
             )}
           </div>
 
-          <div className="bg-gray-100 shadow-md rounded-lg">
+          <div className="bg-gray-100 shadow-md rounded-lg overflow-y-auto h-[90%]">
             <ApiTester
               page={selectedPageDetails?.page}
               api={selectedPageDetails?.apis[0] ?? null}

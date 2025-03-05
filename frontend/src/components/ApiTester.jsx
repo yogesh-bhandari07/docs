@@ -215,7 +215,7 @@ export default function ApiTester({ page, api }) {
               </div>
             ))}
             <button
-              className="bg-primary text-white px-4 py-2 rounded-md"
+              className="bg-primary text-black px-4 py-2 rounded-md"
               onClick={() => handleAddField(setter)}
             >
               + Add
@@ -229,11 +229,13 @@ export default function ApiTester({ page, api }) {
           Save
         </button>
 
-        <div className="mt-6 overflow-x-scroll">
+        <div className="mt-6 w-full max-w-2xl">
           <h2 className="text-lg font-bold mb-2 text-secondary">Response</h2>
-          <div className="p-4 bg-white rounded-md shadow-md text-textDark">
+          <div className="p-4 bg-white rounded-md shadow-md text-textDark w-full max-w-full overflow-auto">
             {response ? (
-              <pre>{JSON.stringify(response, null, 2)}</pre>
+              <pre className="whitespace-pre-wrap break-words">
+                {JSON.stringify(response, null, 2)}
+              </pre>
             ) : (
               <p>No response yet.</p>
             )}
