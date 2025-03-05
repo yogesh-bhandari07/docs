@@ -125,3 +125,19 @@ export const getPageData = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const updatePageContent = async (req, res) => {
+  try {
+    const { content } = req.body;
+    const page = await Page.findByIdAndUpdate(
+      req.body._id,
+      {
+        content,
+      },
+      { new: true }
+    );
+    res.status(200).json({ message: "Page updated successfully!", page });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

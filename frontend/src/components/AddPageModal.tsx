@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { apiRequest } from "@/services/api";
+import Toast from "@/components/Toast";
 
 const pageSchema = z.object({
   name: z.string().min(3, "Page name must be at least 3 characters"),
@@ -18,6 +19,8 @@ export default function AddPageModal({
   onSave: (data: any) => void;
   project_id: number;
 }) {
+  const [toast, setToast] = useState<any>({ message: "", type: "" });
+
   console.log("Project ID:", project_id);
   const [form, setForm]: any = useState({
     name: "",
@@ -51,8 +54,13 @@ export default function AddPageModal({
       if (response) {
         onSave(form);
         onClose();
+        setToast({ message: "Page Added Successfully", type: "success" });
       }
     } catch (error) {
+      setToast({
+        message: "Something went wrong",
+        type: "error",
+      });
       console.error("Error submitting form:", error);
     }
   };
@@ -144,6 +152,13 @@ export default function AddPageModal({
           </button>
         </div>
       </div>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

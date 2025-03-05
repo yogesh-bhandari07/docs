@@ -3,6 +3,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { apiRequest } from "@/services/api";
 import { useRouter } from "next/router";
+import Toast from "@/components/Toast";
 
 const projectSchema = z.object({
   name: z.string().min(3, "Project name must be at least 3 characters"),
@@ -18,6 +19,8 @@ export default function AddProjectModal({
   onClose: () => void;
   onSave: (data: any) => void;
 }) {
+  const [toast, setToast] = useState<any>({ message: "", type: "" });
+
   const [form, setForm] = useState({
     name: "",
     colorTheme: "#000000",
@@ -70,8 +73,13 @@ export default function AddProjectModal({
       if (response) {
         onSave(form);
         onClose();
+        setToast({ message: "Response Received", type: "success" });
       }
     } catch (error) {
+      setToast({
+        message: "Something went wrong",
+        type: "error",
+      });
       console.error("Error submitting form:", error);
     }
   };
@@ -159,6 +167,14 @@ export default function AddProjectModal({
           </button>
         </div>
       </div>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

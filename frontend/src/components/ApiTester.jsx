@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { apiRequest } from "@/services/api";
+import Toast from "@/components/Toast";
 
 export default function ApiTester({ page, api }) {
+  const [toast, setToast] = useState(null);
   const [method, setMethod] = useState("GET");
   const [url, setUrl] = useState("");
   const [authType, setAuthType] = useState("none");
@@ -14,7 +16,6 @@ export default function ApiTester({ page, api }) {
   const [bodyParams, setBodyParams] = useState([{ key: "", value: "" }]);
   const [response, setResponse] = useState(null);
 
-  // API data ko prefill karne ke liye useEffect
   useEffect(() => {
     console.log("API data:", api);
     if (api) {
@@ -97,8 +98,10 @@ export default function ApiTester({ page, api }) {
         data: bodyObj,
       });
       setResponse(res.data);
+      setToast({ message: "Response Received", type: "success" });
     } catch (error) {
       setResponse(error.response ? error.response.data : error.message);
+      setToast({ message: error.message, type: "error" });
     }
   };
 
@@ -131,8 +134,10 @@ export default function ApiTester({ page, api }) {
       );
 
       console.log("API details saved successfully!", response);
+      setToast({ message: "API details saved successfully!", type: "success" });
     } catch (error) {
       console.error("Error saving API details:", error);
+      setToast({ message: error.message, type: "error" });
     }
   };
 
@@ -229,6 +234,13 @@ export default function ApiTester({ page, api }) {
           </div>
         </div>
       </div>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }
