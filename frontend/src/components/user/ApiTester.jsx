@@ -55,15 +55,6 @@ export default function ApiTester({ page, api }) {
     }
   }, [api]);
 
-  const handleAddField = (setter) =>
-    setter((prev) => [...prev, { key: "", value: "" }]);
-  const handleRemoveField = (index, setter) =>
-    setter((prev) => prev.filter((_, i) => i !== index));
-  const handleChangeField = (index, field, value, setter) =>
-    setter((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
-    );
-
   const buildUrlWithParams = () => {
     const params = queryParams
       .filter((p) => p.key && p.value)
@@ -101,42 +92,6 @@ export default function ApiTester({ page, api }) {
       setToast({ message: "Response Received", type: "success" });
     } catch (error) {
       setResponse(error.response ? error.response.data : error.message);
-      setToast({ message: error.message, type: "error" });
-    }
-  };
-
-  const handleSubmit = async () => {
-    try {
-      console.log("Submitting API details...", {
-        url,
-        method,
-        headers,
-        params: queryParams,
-        body: bodyParams,
-        pageID: page?._id || null,
-        projectID: page?.projectID || null,
-      });
-
-      const response = await apiRequest(
-        "/page-api",
-        "POST",
-        {
-          url,
-          method,
-          headers,
-          params: queryParams,
-          body: bodyParams,
-          sample: null,
-          pageID: page?._id || null,
-          projectID: page?.projectID || null,
-        },
-        false
-      );
-
-      console.log("API details saved successfully!", response);
-      setToast({ message: "API details saved successfully!", type: "success" });
-    } catch (error) {
-      console.error("Error saving API details:", error);
       setToast({ message: error.message, type: "error" });
     }
   };
@@ -206,28 +161,10 @@ export default function ApiTester({ page, api }) {
                     handleChangeField(index, "value", e.target.value, setter)
                   }
                 />
-                <button
-                  className="bg-red-500 text-white px-3 py-1 rounded-md"
-                  onClick={() => handleRemoveField(index, setter)}
-                >
-                  X
-                </button>
               </div>
             ))}
-            <button
-              className="bg-primary text-white px-4 py-2 rounded-md"
-              onClick={() => handleAddField(setter)}
-            >
-              + Add
-            </button>
           </div>
         ))}
-        <button
-          className="w-full bg-amber-500 px-6 py-3 rounded-md mt-4"
-          onClick={handleSubmit}
-        >
-          Save
-        </button>
 
         <div className="mt-6 overflow-x-scroll">
           <h2 className="text-lg font-bold mb-2 text-secondary">Response</h2>

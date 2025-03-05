@@ -1,23 +1,21 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { subDomainMiddleware } from "./middleware/subDomainMiddleware";
+import { AuthMiddleware } from "./middleware/AuthMiddleware";
 
-export function middleware(request: NextRequest) {
-  const token = request.cookies.get("token")?.value;
-  if (
-    !token &&
-    !["/admin/login", "/admin/register"].includes(request.nextUrl.pathname)
-  ) {
-    return NextResponse.redirect(new URL("/admin/login", request.url));
+export function middleware(req: NextRequest) {
+  const host = req.headers.get("host") || "";
+  const mainDomain: string =
+    process.env.NEXT_PUBLIC_HOST_DOMAIN || "example.com";
+  const parts = host.split(".");
+
+  if (parts.length > 2 && host.endsWith(mainDomain)) {
+    return subDomainMiddleware(req);
+  } else {
+    return AuthMiddleware(req);
   }
-
-  return NextResponse.next();
 }
 
+// Apply middleware to all routes
 export const config = {
-  matcher: [
-    "/admin/dashboard",
-    "/admin/project",
-    "/admin/login",
-    "/admin/register",
-  ],
+  matcher: "/:path*",
 };
