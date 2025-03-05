@@ -15,8 +15,6 @@ export async function registerAdmin(data) {
   return responseData;
 }
 
-import Cookies from "js-cookie";
-
 export async function login(email, password) {
   try {
     const res = await fetch(
@@ -31,12 +29,9 @@ export async function login(email, password) {
     const responseData = await res.json();
     if (!res.ok) throw new Error(responseData.message || "Login failed");
 
-    Cookies.set("token", responseData.token, {
-      expires: 1,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
-    });
+    document.cookie = `token=${responseData.token}; path=/;expires=${new Date(
+      Date.now() + 1000 * 60 * 60 * 24 * 30
+    ).toUTCString()}`;
 
     return responseData;
   } catch (error) {

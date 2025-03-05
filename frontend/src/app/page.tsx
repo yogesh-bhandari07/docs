@@ -4,10 +4,11 @@ import Editor from "@/components/user/Editor";
 import { use, useEffect, useState } from "react";
 import { apiRequest } from "@/services/api";
 import ApiTester from "@/components/user/ApiTester";
-import { headers } from "next/headers";
+// import { headers } from "next/headers";
 export default async function Home() {
-  const requestHeaders = await headers();
-  const slugOfProject = requestHeaders.get("slugOfProject") || "No Subdomain";
+  // const requestHeaders = await headers();
+  // const slugOfProject = requestHeaders.get("slugOfProject") || "No Subdomain";
+  const slugOfProject = "No Subdomain";
   const [project, setProject]: any = useState([]);
   const [selectedPage, setSelectedPage] = useState<any>(null);
   const [selectedPageDetails, setSelectedPageDetails] = useState<any>(null);

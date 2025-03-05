@@ -7,7 +7,7 @@ import SkeletonLoader from "@/components/ui/SkeletonLoader";
 import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
-  const [projects, setProjects] = useState([]); // ✅ Initialize as empty array
+  const [projects, setProjects] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

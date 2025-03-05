@@ -4,7 +4,11 @@ export async function apiRequest(
   body = null,
   isFormData = false
 ) {
-  const token = request.cookies.get("token")?.value;
+  // get token from cookie
+  const token = document.cookie.replace(
+    /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+    "$1"
+  );
 
   const headers = token ? { Authorization: `Bearer ${token}` } : {};
 

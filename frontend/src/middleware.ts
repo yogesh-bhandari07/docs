@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { subDomainMiddleware } from "./middleware/subDomainMiddleware";
-import { AuthMiddleware } from "./middleware/AuthMiddleware";
+import subDomainMiddleware from "./middleware/subDomainMiddleware";
+import AuthMiddleware from "./middleware/AuthMiddleware";
 
 export function middleware(req: NextRequest) {
   const host = req.headers.get("host") || "";

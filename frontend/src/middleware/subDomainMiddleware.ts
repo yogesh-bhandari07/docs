@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export function subDomainMiddleware(req: NextRequest) {
+export default function subDomainMiddleware(req: NextRequest) {
   const host = req.headers.get("host") || "";
-  const mainDomain = "example.com";
+  const mainDomain = process.env.NEXT_PUBLIC_HOST || "localhost";
   const parts = host.split(".");
 
   let subdomain = "";
